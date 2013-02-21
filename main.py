@@ -26,7 +26,7 @@ class Index(webapp2.RequestHandler):
 	def get(self):
 		allNotes = Note.all().order("-text")
 		if allNotes.count(limit=2) == 0:
-			note = Note(text="Hej",color="red")
+			note = Note(text="Hej",color="red",yCoord=500,xCoord=300)
 			note.put()
 			allNotes = [note]
 		template_values = {

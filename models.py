@@ -11,3 +11,6 @@ class Note(db.Model):
 	text = db.StringProperty(required=True)
 	color = db.StringProperty(required=True, choices=set(["red", "orange", "yellow", "green", "white"]))
 	board = db.ReferenceProperty(Board)
+	xCoord = db.IntegerProperty(required=True)
+	yCoord = db.IntegerProperty(required=True)
+	
