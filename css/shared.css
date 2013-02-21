@@ -12,3 +12,7 @@ div#header {
 	padding: 0.7em;
 	height: 1.4em;
 }
+
+span#userName {
+	margin-right: 0.7em;
+}
