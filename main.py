@@ -20,6 +20,8 @@ from auth import requiresLogin
 from errors import *
 from rendering import renderTemplate
 from models import Note
+from rest.BasicAuthenticator import BasicAuthenticator
+import rest
 
 class Index(webapp2.RequestHandler):
 	@requiresLogin
@@ -35,6 +37,12 @@ class Index(webapp2.RequestHandler):
 		self.response.write(renderTemplate('index.html',template_values))
 
 app = webapp2.WSGIApplication([
-    ('/', Index)
+    ('/', Index),
+	('/rest/.*', rest.Dispatcher)
 ], debug=True)
 app.error_handlers[403] = handle_403
+
+rest.Dispatcher.authenticator = BasicAuthenticator()
+rest.Dispatcher.base_url = "/rest"
+rest.Dispatcher.add_models({
+  "note": Note})

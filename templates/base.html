@@ -1,11 +1,44 @@
 <html>
 <head>
 	<title>Noteboard</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+	<script>
+	$(document).ready(function() {
+		$(".note").draggable({
+			stop: function(event, ui) {
+				//noteId = ;
+				//noteKey = noteId.substring(noteId.lastIndexOf("-")+1);
+				//console.log(noteKey);
+		        //console.log(ui.position.top);
+				$.ajax({
+					url: "/rest/note/" + event.target.id,
+					type: "POST",
+					contentType: "application/json",
+					dataType: "json",
+					data: JSON.stringify({"note": {"yCoord": ui.position.top, "xCoord": ui.position.left}})
+				});
+				/*
+				$.ajax({
+					url: "/rest/note/ag1kZXZ-bm90ZWJvYXJkcgoLEgROb3RlGAQM",
+					type: "GET",
+					dataType: "json",
+					success: function(data){        
+						alert(data);
+					}
+				})*/
+			}
+		});
+	});
+	
+	
+	</script>
 </head>
 <body>
 	<div id="header">
 		<div id="userName">{{ user_name }}</a>
 		<div id="logoutLink"><a href="{{ logout_url }}">Log out</a></div>
+		<a href="">test</a>
 	</div>
 	<div id="content">
         {% block content %}{% endblock %}

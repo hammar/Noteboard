@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Notes Listing</h1>
 		{% for note in notes %}
-		<div id="note-{{note.key().id_or_name()}}" style="position: absolute; top: {{note.yCoord}}px; left:{{note.xCoord}}px; background-color: {{note.color}}; border: 1px solid black; width: 250px; height: 100px;">
+		<div id="{{note.key()}}" class="note" style="position: absolute; top: {{note.yCoord}}px; left:{{note.xCoord}}px; background-color: {{note.color}}; border: 1px solid black; width: 250px; height: 100px;">
 			{{note.text}}
 		</div>
 	    {% endfor %}
