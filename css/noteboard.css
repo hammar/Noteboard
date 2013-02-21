@@ -1,0 +1,50 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+	font-size: 14px;
+}
+
+.ui-widget { font-size: 12px; }
+
+div#header {
+	border-bottom: 2px solid blue;
+	background-color: silver;
+	padding: 0.7em;
+	height: 1.4em;
+}
+
+div.note {
+	position: absolute; 
+	border: 1px solid black; 
+	width: 250px; 
+	height: 100px;
+}
+
+button#newButton{
+	font-size: 0.9em;
+	position: absolute;
+	right: 1em;
+}
+
+div#template {
+	display: none;
+}
+
+div#delete-confirm {
+	display: none;
+}
+
+div#newNote-form {
+	display: none;
+	padding-top: 2em;
+}
+
+div#newNote-form textarea {
+	width: 20em;
+	height: 5em;
+}
+
+div#newNote-form select {
+	width: 20em;
+}

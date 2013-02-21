@@ -9,13 +9,15 @@ handlers:
   script: admin.app
   login: admin
 
+- url: /images
+  static_dir: images
+
+- url: /css
+  static_dir: css
+
 - url: .*
   script: main.app
   login: required
-
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
 
 libraries:
 - name: webapp2

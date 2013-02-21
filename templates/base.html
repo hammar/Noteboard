@@ -1,16 +1,14 @@
 <html>
 <head>
 	<title>Noteboard</title>
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/base/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/noteboard.css" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
 	<script>
 	$(document).ready(function() {
 		$(".note").draggable({
 			stop: function(event, ui) {
-				//noteId = ;
-				//noteKey = noteId.substring(noteId.lastIndexOf("-")+1);
-				//console.log(noteKey);
-		        //console.log(ui.position.top);
 				$.ajax({
 					url: "/rest/note/" + event.target.id,
 					type: "POST",
@@ -18,27 +16,78 @@
 					dataType: "json",
 					data: JSON.stringify({"note": {"yCoord": ui.position.top, "xCoord": ui.position.left}})
 				});
-				/*
-				$.ajax({
-					url: "/rest/note/ag1kZXZ-bm90ZWJvYXJkcgoLEgROb3RlGAQM",
-					type: "GET",
-					dataType: "json",
-					success: function(data){        
-						alert(data);
-					}
-				})*/
 			}
 		});
+		$(".deleteButton").click(function(event) {
+			$("#delete-confirm").dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete": function() {
+						var key = $(event.target).closest("div").attr('id');
+						$.ajax({
+							url: "/rest/note/" + key,
+							type: "DELETE",
+						});
+						$(event.target).closest("div").remove();
+						$(this).dialog( "close" );
+					},
+					Cancel: function() {
+						$(this).dialog( "close" );
+					}
+				}
+			});
+		});
+		$( "#newNote-form" ).dialog({
+			autoOpen: false,
+			height: 275,
+			width: 265,
+			modal: true,
+			buttons: {
+				"Create note": function() {
+					var text =  $("#newNote-text").val();
+					var color = $("#newNote-color").val();
+					var xCoord = Math.floor(window.innerWidth/2)-125;
+					var yCoord = Math.floor(window.innerHeight/2)-50;
+					var note = {"note": {"text":text, "color":color, "yCoord":yCoord, "xCoord":xCoord}};
+					$.ajax({
+						url: "/rest/note",
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify(note)
+					}).done(function(msg) {
+						// TODO: Get cloning working below
+						var $templateNote = $("#note-template");
+						$newNote = $templateNote.clone(true);
+						$newNote.attr("id",msg);
+						$newNote.css("color", color);
+						$newNote.css("display", "block");
+						$newNote.offset({ top: yCoord, left: xCoord});
+						$("#content").append($newNote);
+					});
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				$(".newNote-field").each(function() {
+					$(this).val("");
+				});
+			}
+		});
+		$("#newButton").click(function(event) {
+			$( "#newNote-form" ).dialog( "open" );
+		});
 	});
-	
-	
 	</script>
 </head>
 <body>
 	<div id="header">
-		<div id="userName">{{ user_name }}</a>
-		<div id="logoutLink"><a href="{{ logout_url }}">Log out</a></div>
-		<a href="">test</a>
+		<span id="userName">{{ user_name }}</span> <a id="logoutLink" href="{{ logout_url }}">Log out</a>
+		<button id="newButton">+</button>
 	</div>
 	<div id="content">
         {% block content %}{% endblock %}
