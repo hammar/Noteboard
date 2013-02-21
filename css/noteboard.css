@@ -27,7 +27,7 @@ button#newButton{
 	right: 1em;
 }
 
-div#template {
+div#newNote-template {
 	display: none;
 }
 

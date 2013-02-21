@@ -20,14 +20,14 @@
  	</form>
 </div>
 
-<div id="#note-template" class="template">
+<div id="newNote-template" class="note">
 	<img src="/images/delete.png" alt="Delete note" class="deleteButton" id="testID" />
 	<span class="noteText">Nothing</span>
 </div>
 
 {% for note in notes %}
 	<div id="{{note.key()}}" class="note" style="top: {{note.yCoord}}px; left:{{note.xCoord}}px; background-color: {{note.color}};">
-		<img src="/images/delete.png" alt="Delete note" class="deleteButton" id="testID" />
+		<img src="/images/delete.png" alt="Delete note" class="deleteButton" />
 		<span class="noteText">{{note.text}}</span>
 	</div>
 {% endfor %}

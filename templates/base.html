@@ -6,8 +6,8 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
 	<script>
-	$(document).ready(function() {
-		$(".note").draggable({
+	function makeDraggable() {
+		$(this).draggable({
 			stop: function(event, ui) {
 				$.ajax({
 					url: "/rest/note/" + event.target.id,
@@ -18,7 +18,9 @@
 				});
 			}
 		});
-		$(".deleteButton").click(function(event) {
+	}
+	function makeDeletable() {
+		$(this).click(function(event) {
 			$("#delete-confirm").dialog({
 				resizable: false,
 				height:200,
@@ -39,6 +41,10 @@
 				}
 			});
 		});
+	}
+	$(document).ready(function() {
+		$(".note").each(makeDraggable);
+		$(".deleteButton").each(makeDeletable);
 		$( "#newNote-form" ).dialog({
 			autoOpen: false,
 			height: 275,
@@ -57,13 +63,15 @@
 						contentType: "application/json",
 						data: JSON.stringify(note)
 					}).done(function(msg) {
-						// TODO: Get cloning working below
-						var $templateNote = $("#note-template");
-						$newNote = $templateNote.clone(true);
+						var templateNote = $("div#newNote-template");
+						$newNote = templateNote.clone();
 						$newNote.attr("id",msg);
-						$newNote.css("color", color);
-						$newNote.css("display", "block");
+						$newNote.css("background-color", color);
+						$newNote.css("display", "");
 						$newNote.offset({ top: yCoord, left: xCoord});
+						$newNote.children("span.noteText").text(text);
+						$newNote.children("img.deleteButton").each(makeDeletable);
+						$newNote.each(makeDraggable);
 						$("#content").append($newNote);
 					});
 					$( this ).dialog( "close" );
