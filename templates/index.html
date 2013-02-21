@@ -1,34 +1,134 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div id="delete-confirm" title="Remove note?">
-<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>This note will be permanently deleted and cannot be recovered. Are you sure?</p>
-</div>
-
-<div id="newNote-form" title="Create new note">
-	<form>
-			<label for="text">Text:</label><br />
-			<textarea name="text" id="newNote-text" class="text ui-widget-content ui-corner-all newNote-field" ></textarea><br /><br />
-			<label for="color">Color</label><br />
-			<select name="color" id="newNote-color" class="text ui-widget-content ui-corner-all newNote-field">
-			  <option value="red">Red</option>
-			  <option value="orange">Orange</option>
-			  <option value="yellow">Yellow</option>
-			  <option value="green">Green</option>
-			  <option value="white">White</option>
-			</select>
- 	</form>
-</div>
-
-<div id="newNote-template" class="note">
-	<img src="/images/delete.png" alt="Delete note" class="deleteButton" id="testID" />
-	<span class="noteText">Nothing</span>
-</div>
-
-{% for note in notes %}
-	<div id="{{note.key()}}" class="note" style="top: {{note.yCoord}}px; left:{{note.xCoord}}px; background-color: {{note.color}};">
-		<img src="/images/delete.png" alt="Delete note" class="deleteButton" />
-		<span class="noteText">{{note.text}}</span>
+<html>
+<head>
+	<title>Noteboard</title>
+	<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/themes/base/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="/css/shared.css" />
+	<link rel="stylesheet" type="text/css" href="/css/noteboard.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+	<script>
+	function makeDraggable() {
+		$(this).draggable({
+			stop: function(event, ui) {
+				$.ajax({
+					url: "/rest/note/" + event.target.id,
+					type: "POST",
+					contentType: "application/json",
+					dataType: "json",
+					data: JSON.stringify({"note": {"yCoord": ui.position.top, "xCoord": ui.position.left}})
+				});
+			}
+		});
+	}
+	function makeDeletable() {
+		$(this).click(function(event) {
+			$("#delete-confirm").dialog({
+				resizable: false,
+				height:200,
+				modal: true,
+				buttons: {
+					"Delete": function() {
+						var key = $(event.target).closest("div").attr('id');
+						$.ajax({
+							url: "/rest/note/" + key,
+							type: "DELETE",
+						});
+						$(event.target).closest("div").remove();
+						$(this).dialog( "close" );
+					},
+					Cancel: function() {
+						$(this).dialog( "close" );
+					}
+				}
+			});
+		});
+	}
+	$(document).ready(function() {
+		$(".note").each(makeDraggable);
+		$(".deleteButton").each(makeDeletable);
+		$( "#newNote-form" ).dialog({
+			autoOpen: false,
+			height: 275,
+			width: 265,
+			modal: true,
+			buttons: {
+				"Create note": function() {
+					var text =  $("#newNote-text").val();
+					var color = $("#newNote-color").val();
+					var xCoord = Math.floor(window.innerWidth/2)-125;
+					var yCoord = Math.floor(window.innerHeight/2)-50;
+					var note = {"note": {"text":text, "color":color, "yCoord":yCoord, "xCoord":xCoord}};
+					$.ajax({
+						url: "/rest/note",
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify(note)
+					}).done(function(msg) {
+						var templateNote = $("div#newNote-template");
+						$newNote = templateNote.clone();
+						$newNote.attr("id",msg);
+						$newNote.css("background-color", color);
+						$newNote.css("display", "");
+						$newNote.offset({ top: yCoord, left: xCoord});
+						$newNote.children("span.noteText").text(text);
+						$newNote.children("img.deleteButton").each(makeDeletable);
+						$newNote.each(makeDraggable);
+						$("#content").append($newNote);
+					});
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				$(".newNote-field").each(function() {
+					$(this).val("");
+				});
+			}
+		});
+		$("#newButton").click(function(event) {
+			$( "#newNote-form" ).dialog( "open" );
+		});
+	});
+	</script>
+</head>
+<body>
+	<div id="header">
+		<span id="userName">{{ user_name }}</span> <a id="logoutLink" href="{{ logout_url }}">Log out</a>
+		<button id="newButton">+</button>
 	</div>
-{% endfor %}
-{% endblock %}
+	<div id="content">
+		<div id="delete-confirm" title="Remove note?">
+			<p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>This note will be permanently deleted and cannot be recovered. Are you sure?</p>
+		</div>
+		
+		<div id="newNote-form" title="Create new note">
+			<form>
+				<label for="text">Text:</label><br />
+				<textarea name="text" id="newNote-text" class="text ui-widget-content ui-corner-all newNote-field" ></textarea><br /><br />
+				<label for="color">Color</label><br />
+				<select name="color" id="newNote-color" class="text ui-widget-content ui-corner-all newNote-field">
+			  		<option value="red">Red</option>
+			  		<option value="orange">Orange</option>
+			  		<option value="yellow">Yellow</option>
+			  		<option value="green">Green</option>
+			  		<option value="white">White</option>
+				</select>
+ 			</form>
+		</div>
+
+		<div id="newNote-template" class="note">
+			<img src="/images/delete.png" alt="Delete note" class="deleteButton" id="testID" />
+			<span class="noteText">Nothing</span>
+		</div>
+
+		{% for note in notes %}
+			<div id="{{note.key()}}" class="note" style="top: {{note.yCoord}}px; left:{{note.xCoord}}px; background-color: {{note.color}};">
+				<img src="/images/delete.png" alt="Delete note" class="deleteButton" />
+				<span class="noteText">{{note.text}}</span>
+			</div>
+		{% endfor %}
+    </div>
+</body>
+</html>
