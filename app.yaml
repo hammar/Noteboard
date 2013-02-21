@@ -8,13 +8,14 @@ handlers:
 - url: /admin/.*
   script: admin.app
   login: admin
-    
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
 
 - url: .*
   script: main.app
+  login: required
+
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
 
 libraries:
 - name: webapp2

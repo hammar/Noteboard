@@ -16,10 +16,25 @@
 #
 import webapp2
 
-class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world.')
+from auth import requiresLogin
+from errors import *
+from rendering import renderTemplate
+from models import Note
+
+class Index(webapp2.RequestHandler):
+	@requiresLogin
+	def get(self):
+		allNotes = Note.all().order("-text")
+		if allNotes.count(limit=2) == 0:
+			note = Note(text="Hej",color="red")
+			note.put()
+			allNotes = [note]
+		template_values = {
+			'notes': allNotes
+		}
+		self.response.write(renderTemplate('index.html',template_values))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', Index)
 ], debug=True)
+app.error_handlers[403] = handle_403

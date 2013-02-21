@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Notes Listing</h1>
+	<ul>
+		{% for note in notes %}
+		<li>{{ note.text }} -- {{ note.color }} -- {{ note.board }}</li>
+	    {% endfor %}
+	</ul>
+{% endblock %}
